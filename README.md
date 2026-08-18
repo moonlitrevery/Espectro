@@ -67,7 +67,13 @@ Python 3.11+ e [uv](https://docs.astral.sh/uv/). Não usamos `pip` nem
 uv sync
 uv run pytest
 uv run python -m src.data_prep
+uv run python -m src.graph_builder
 ```
 
-O último comando imprime quantas estações únicas restam por município
-depois da limpeza e da deduplicação.
+`data_prep` imprime as estações únicas por município. `graph_builder`
+monta o grafo para alguns valores de `D` (0,5 / 1 / 2 / 5 km) e mostra
+número de arestas, densidade e graus — para o relatório e para escolher
+o raio das instâncias.
+
+O `D` padrão do código é **1 km** (alcance típico de macrocélula urbana).
+É um parâmetro, não um resultado: as instâncias vão variar esse valor.
