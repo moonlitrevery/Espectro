@@ -77,3 +77,10 @@ o raio das instâncias.
 
 O `D` padrão do código é **1 km** (alcance típico de macrocélula urbana).
 É um parâmetro, não um resultado: as instâncias vão variar esse valor.
+
+```bash
+uv run python -m src.coloring.greedy_natural
+```
+
+Roda o guloso natural no grafo com `D = 1 km` e imprime quantas cores
+ele usou, ao lado do teto teórico Δ+1.
