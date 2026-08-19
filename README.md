@@ -96,3 +96,10 @@ uv run python -m src.coloring.dsatur
 ```
 
 Compara os três algoritmos (natural, Welsh–Powell, DSATUR) em D = 1 km.
+
+```bash
+uv run python -m src.coloring.validator
+```
+
+Roda os três algoritmos e valida cada coloração de forma independente
+(nenhum par adjacente com a mesma cor).
