@@ -74,6 +74,14 @@ uv run python -m src.instances
 
 Imprime n, m, densidade e isolados de cada instância.
 
+```bash
+uv run python -m src.analysis
+```
+
+Roda os três algoritmos em cada instância, valida a coloração, estima o
+piso por clique e imprime cores, gap e tempo. Este é o número que entra
+na tabela de resultados do relatório.
+
 Colunas usadas do CSV (separador `|`): `NumEstacao`,
 `Municipio.NomeMunicipio`, `Latitude`, `Longitude`, `NomeEntidade`,
 `EnderecoEstacao`, `Tecnologia`, `FreqTxMHz`, `SiglaUf`.
