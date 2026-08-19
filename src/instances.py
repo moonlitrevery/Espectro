@@ -18,7 +18,7 @@ grande. Assim o relatório separa “efeito do tamanho” de “efeito de D”.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import networkx as nx
@@ -112,6 +112,9 @@ INSTANCE_SPECS: tuple[InstanceSpec, ...] = (
     ),
 )
 
+# Recortes geográficos do dashboard (o slider cobre as variações de D).
+GEOGRAPHIC_INSTANCE_IDS = ("small", "medium", "large")
+
 _SPECS_BY_ID = {spec.instance_id: spec for spec in INSTANCE_SPECS}
 
 
@@ -145,6 +148,7 @@ def load_instance(
     instance_id: str,
     csv_path: str | Path | None = None,
     stations: pd.DataFrame | None = None,
+    radius_km: float | None = None,
 ) -> LoadedInstance:
     """Lê (ou reutiliza) as estações, filtra municípios e monta o grafo.
 
@@ -154,8 +158,12 @@ def load_instance(
         Catálogo já deduplicado. Se ``None``, carrega o CSV. O
         ``analysis.py`` passa o catálogo para não reler o arquivo em
         cada instância.
+    radius_km:
+        Se informado, substitui o D da receita (o slider do dashboard).
     """
     spec = get_spec(instance_id)
+    if radius_km is not None:
+        spec = replace(spec, radius_km=radius_km)
     catalog = (
         stations
         if stations is not None

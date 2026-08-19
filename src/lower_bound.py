@@ -77,7 +77,10 @@ def greedy_clique_from(
     return clique
 
 
-def estimate_max_clique(graph: nx.Graph) -> CliqueEstimate:
+def estimate_max_clique(
+    graph: nx.Graph,
+    max_starts: int | None = None,
+) -> CliqueEstimate:
     """Tenta um clique guloso a partir de cada vértice; fica com o maior.
 
     Não é enumeração de cliques máximos. É “o melhor que o guloso achou
@@ -87,12 +90,18 @@ def estimate_max_clique(graph: nx.Graph) -> CliqueEstimate:
     clique maior que d+1. Se já vimos um clique desse tamanho, pulamos.
     Começamos pelos graus altos para achar um clique grande cedo e podar
     mais.
+
+    ``max_starts`` limita quantos começos tentar (os de maior grau). O
+    dashboard usa um teto para responder na hora; o relatório chama sem
+    limite.
     """
     neighbors_of = _neighbor_sets(graph)
     starts = sorted(
         graph.nodes(),
         key=lambda vertex: (-len(neighbors_of[vertex]), str(vertex)),
     )
+    if max_starts is not None:
+        starts = starts[: max(0, max_starts)]
 
     best_clique: list = []
     for start in starts:

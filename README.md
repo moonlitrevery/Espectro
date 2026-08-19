@@ -82,6 +82,14 @@ Roda os três algoritmos em cada instância, valida a coloração, estima o
 piso por clique e imprime cores, gap e tempo. Este é o número que entra
 na tabela de resultados do relatório.
 
+```bash
+uv run streamlit run app.py
+```
+
+Abre o dashboard: escolher recorte (pequena/média/grande), ajustar D no
+slider, rodar os três algoritmos e ver o mapa Folium pintado por canal.
+Os gráficos de barras são Plotly.
+
 Colunas usadas do CSV (separador `|`): `NumEstacao`,
 `Municipio.NomeMunicipio`, `Latitude`, `Longitude`, `NomeEntidade`,
 `EnderecoEstacao`, `Tecnologia`, `FreqTxMHz`, `SiglaUf`.

@@ -67,3 +67,12 @@ def test_n_colors_come_from_the_validator_not_len_of_dict():
     run = analysis.run_for("dsatur")
     assert set(run.coloring) == set(loaded.graph.nodes())
     assert run.n_colors == len(set(run.coloring.values()))
+
+
+def test_skipping_clique_does_not_claim_optimality():
+    loaded = load_instance("medium", csv_path=FIXTURE)
+    analysis = analyze_instance(loaded, compute_clique=False)
+    assert analysis.clique_computed is False
+    table = results_table([analysis])
+    assert not bool(table["is_optimal"].any())
+    assert table["clique_lower_bound"].isna().all()

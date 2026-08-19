@@ -103,3 +103,10 @@ def test_unknown_start_raises():
     graph.add_node("A")
     with pytest.raises(ValueError):
         greedy_clique_from(graph, "Z")
+
+
+def test_max_starts_still_finds_complete_graph_from_one_vertex():
+    """Um único começo em K4 já devolve o clique inteiro."""
+    graph = nx.complete_graph(["A", "B", "C", "D"])
+    estimate = estimate_max_clique(graph, max_starts=1)
+    assert estimate.size == 4

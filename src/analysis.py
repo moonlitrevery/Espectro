@@ -60,6 +60,7 @@ class InstanceAnalysis:
     max_degree: int
     clique_size: int
     clique_seconds: float
+    clique_computed: bool
     runs: tuple[AlgorithmResult, ...]
 
     def run_for(self, algorithm_id: str) -> AlgorithmResult:
@@ -69,14 +70,28 @@ class InstanceAnalysis:
         raise KeyError(algorithm_id)
 
 
-def analyze_instance(loaded: LoadedInstance) -> InstanceAnalysis:
-    """Piso por clique + os três algoritmos no grafo já montado."""
+def analyze_instance(
+    loaded: LoadedInstance,
+    *,
+    compute_clique: bool = True,
+    clique_max_starts: int | None = None,
+) -> InstanceAnalysis:
+    """Piso por clique + os três algoritmos no grafo já montado.
+
+    ``clique_max_starts`` é o teto de começos da heurística de clique.
+    ``None`` tenta todos (relatório). O dashboard passa um número baixo.
+    """
     graph = loaded.graph
     summary = summarize_graph(graph)
 
-    clique_started = time.perf_counter()
-    clique = estimate_max_clique(graph)
-    clique_seconds = time.perf_counter() - clique_started
+    if compute_clique:
+        clique_started = time.perf_counter()
+        clique = estimate_max_clique(graph, max_starts=clique_max_starts)
+        clique_seconds = time.perf_counter() - clique_started
+        clique_size = clique.size
+    else:
+        clique_seconds = 0.0
+        clique_size = 0
 
     runs = tuple(
         _run_algorithm(algorithm_id, title, color_fn, graph)
@@ -90,8 +105,9 @@ def analyze_instance(loaded: LoadedInstance) -> InstanceAnalysis:
         n_vertices=int(summary["n_nodes"]),
         n_edges=int(summary["n_edges"]),
         max_degree=int(summary["max_degree"]),
-        clique_size=clique.size,
+        clique_size=clique_size,
         clique_seconds=clique_seconds,
+        clique_computed=compute_clique,
         runs=runs,
     )
 
@@ -128,7 +144,16 @@ def results_table(analyses: Sequence[InstanceAnalysis]) -> pd.DataFrame:
     rows = []
     for analysis in analyses:
         for run in analysis.runs:
-            gap = run.n_colors - analysis.clique_size
+            gap = (
+                run.n_colors - analysis.clique_size
+                if analysis.clique_computed
+                else None
+            )
+            is_optimal = (
+                run.is_valid
+                and analysis.clique_computed
+                and gap == 0
+            )
             rows.append(
                 {
                     "instance_id": analysis.instance_id,
@@ -137,12 +162,14 @@ def results_table(analyses: Sequence[InstanceAnalysis]) -> pd.DataFrame:
                     "n_vertices": analysis.n_vertices,
                     "n_edges": analysis.n_edges,
                     "max_degree": analysis.max_degree,
-                    "clique_lower_bound": analysis.clique_size,
+                    "clique_lower_bound": (
+                        analysis.clique_size if analysis.clique_computed else None
+                    ),
                     "algorithm_id": run.algorithm_id,
                     "algorithm": run.title,
                     "n_colors": run.n_colors,
                     "gap_to_clique": gap,
-                    "is_optimal": run.is_valid and gap == 0,
+                    "is_optimal": is_optimal,
                     "is_valid": run.is_valid,
                     "elapsed_seconds": run.elapsed_seconds,
                 }
@@ -158,17 +185,28 @@ def format_report(analyses: Sequence[InstanceAnalysis]) -> str:
         "",
     ]
     for analysis in analyses:
+        if analysis.clique_computed:
+            clique_txt = (
+                f"piso clique={analysis.clique_size} "
+                f"({analysis.clique_seconds:.3f}s)"
+            )
+        else:
+            clique_txt = "piso clique não calculado"
         lines.append(
             f"{analysis.instance_id} | {analysis.title} | "
             f"n={analysis.n_vertices} m={analysis.n_edges} | "
             f"D={analysis.radius_km} km | "
             f"Δ={analysis.max_degree} | "
-            f"piso clique={analysis.clique_size} "
-            f"({analysis.clique_seconds:.3f}s)"
+            f"{clique_txt}"
         )
         slice_ = table.loc[table["instance_id"] == analysis.instance_id]
         for _, row in slice_.iterrows():
-            optimal = "ótima" if row["is_optimal"] else f"gap={int(row['gap_to_clique'])}"
+            if row["is_optimal"]:
+                optimal = "ótima"
+            elif row["gap_to_clique"] is None or pd.isna(row["gap_to_clique"]):
+                optimal = "—"
+            else:
+                optimal = f"gap={int(row['gap_to_clique'])}"
             valid = "ok" if row["is_valid"] else "INVÁLIDA"
             lines.append(
                 f"  {row['algorithm']:<16} "

@@ -89,3 +89,15 @@ def test_tighter_radius_does_not_add_edges():
     wide = load_instance("large_d20", stations=catalog)
     assert tight.n_stations == wide.n_stations
     assert tight.n_edges <= wide.n_edges
+
+
+def test_radius_override_changes_only_the_graph():
+    """Slider do dashboard: mesmos municípios, D diferente."""
+    catalog = _catalog()
+    tight = load_instance("small", stations=catalog, radius_km=0.1)
+    wide = load_instance("small", stations=catalog, radius_km=100.0)
+    assert tight.n_stations == wide.n_stations == 3
+    assert tight.n_edges == 0
+    assert wide.n_edges == 3
+    assert tight.spec.radius_km == 0.1
+    assert wide.spec.radius_km == 100.0
