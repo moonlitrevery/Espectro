@@ -90,3 +90,9 @@ uv run python -m src.coloring.welsh_powell
 ```
 
 Compara Welsh–Powell com o guloso natural no mesmo grafo.
+
+```bash
+uv run python -m src.coloring.dsatur
+```
+
+Compara os três algoritmos (natural, Welsh–Powell, DSATUR) em D = 1 km.
