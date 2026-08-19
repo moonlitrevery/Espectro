@@ -84,3 +84,9 @@ uv run python -m src.coloring.greedy_natural
 
 Roda o guloso natural no grafo com `D = 1 km` e imprime quantas cores
 ele usou, ao lado do teto teórico Δ+1.
+
+```bash
+uv run python -m src.coloring.welsh_powell
+```
+
+Compara Welsh–Powell com o guloso natural no mesmo grafo.
