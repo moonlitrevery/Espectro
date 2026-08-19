@@ -54,6 +54,26 @@ Contagem após limpeza e deduplicação pelo `NumEstacao` (CSV atual):
 | Piratininga | 2.759         | 216             |
 | **Total**   | **13.975**    | **2.163**       |
 
+## Instâncias de teste
+
+| id          | Recorte                            | D      | n     | arestas | densidade |
+|-------------|------------------------------------|--------|-------|---------|-----------|
+| `small`     | Agudos + Pederneiras + Piratininga | 1 km   | 868   | 44.759  | 11,9%     |
+| `medium`    | só Bauru                           | 1 km   | 1.295 | 55.958  | 6,7%      |
+| `large`     | Bauru + vizinhos                   | 1 km   | 2.163 | 100.720 | 4,3%      |
+| `large_d05` | mesmos vértices da grande          | 0,5 km | 2.163 | 75.048  | 3,2%      |
+| `large_d20` | mesmos vértices da grande          | 2 km   | 2.163 | 173.854 | 7,4%      |
+
+A pequena, a média e a grande usam o **mesmo D** para isolar o efeito do
+tamanho. As duas últimas isolam o efeito do raio (vértices iguais, D
+diferente).
+
+```bash
+uv run python -m src.instances
+```
+
+Imprime n, m, densidade e isolados de cada instância.
+
 Colunas usadas do CSV (separador `|`): `NumEstacao`,
 `Municipio.NomeMunicipio`, `Latitude`, `Longitude`, `NomeEntidade`,
 `EnderecoEstacao`, `Tecnologia`, `FreqTxMHz`, `SiglaUf`.
