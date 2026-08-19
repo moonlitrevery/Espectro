@@ -103,3 +103,11 @@ uv run python -m src.coloring.validator
 
 Roda os três algoritmos e valida cada coloração de forma independente
 (nenhum par adjacente com a mesma cor).
+
+```bash
+uv run python -m src.lower_bound
+```
+
+Estima um clique grande (piso para χ) e compara com as três colorações.
+Se o número de cores coincidir com o piso, a coloração é ótima naquela
+instância.
